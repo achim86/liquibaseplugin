@@ -1,0 +1,9 @@
+JIRA Bug: https://liquibase.jira.com/browse/CORE-1170
+
+
+To remove the fix rename all fix:fixedLoadUpdateData into loadUpdataData.
+
+
+Removed end delimeter from InsertOrUpdateGenerator due to the reason 
+that I dont know if its needed in other cases I implemented the fix
+as a new tag.

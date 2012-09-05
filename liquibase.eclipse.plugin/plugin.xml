@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Database"
+            id="liquibase.eclipse.plugin">
+      </category>
+      <view
+            name="Liquibase"
+            icon="icons/database.gif"
+            category="liquibase.eclipse.plugin"
+            class="liquibase.eclipse.plugin.view.views.LiquibaseView"
+            id="liquibase.eclipse.plugin.view.views.LiquibaseView">
+      </view>
+   </extension>
+
+</plugin>

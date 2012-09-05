@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Liquibase Plugin
+Bundle-SymbolicName: liquibase.eclipse.plugin;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: liquibase.eclipse.plugin.Activator
+Require-Bundle: 
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.databinding;bundle-version="1.4.1",
+ org.eclipse.core.databinding.beans;bundle-version="1.2.200",
+ org.eclipse.core.databinding.observable;bundle-version="1.4.1",
+ org.eclipse.core.databinding.property;bundle-version="1.4.100",
+ org.eclipse.core.resources;bundle-version="3.8.0",
+ org.eclipse.equinox.security;bundle-version="1.1.100",
+ org.eclipse.jface.databinding;bundle-version="1.6.0",
+ liquibase.plugin;bundle-version="2.0.5",
+ org.oracle.ojdbc;bundle-version="11.2.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib_additional/commons-io-2.4.jar,
+ .

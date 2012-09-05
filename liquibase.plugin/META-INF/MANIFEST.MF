@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Liquibase Plugin
+Bundle-SymbolicName:  liquibase.plugin;singleton:=true
+Bundle-Version: 2.0.5
+Bundle-Activator: liquibase.osgi.LiquibaseActivator
+Export-Package: 
+ liquibase,
+ liquibase.changelog,
+ liquibase.database,
+ liquibase.database.jvm,
+ liquibase.exception,
+ liquibase.resource
+Require-Bundle: 
+ org.eclipse.equinox.common;bundle-version="3.6.100",
+ org.eclipse.osgi;bundle-version="3.8.0",
+ org.oracle.ojdbc;bundle-version="11.2.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment:  JavaSE-1.6
+

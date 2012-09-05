@@ -1,0 +1,7 @@
+JIRA Bug: https://liquibase.jira.com/browse/CORE-1190
+
+
+To remove just drop FixedOracleDatabase.
+
+
+Added keywords (size, start) by overwriting isReservedWord method.
