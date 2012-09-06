@@ -21,6 +21,7 @@ public class LiqConfWizard extends Wizard {
 	private LiqConfPageNewStructure liqConfPageNewStructure;
 	private LiqConfPageExistingStructure liqConfPageExistingStructure;
 	private LiqConfValues liqConfValues;
+	private String newEntryName;
 
 	public LiqConfWizard() {
 		super();
@@ -46,6 +47,8 @@ public class LiqConfWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		TrayDialog.setDialogHelpAvailable(true);
+		
+		newEntryName = liqConfPageChooseStructure.getNameText().getText();
 		
 		if(liqConfValues.isNewStructure()) {
 			boolean result = liqConfWizardController.copyStructure(liqConfPageNewStructure.getPathText().getText());
@@ -104,4 +107,7 @@ public class LiqConfWizard extends Wizard {
 		return liqConfPageExistingStructure;
 	}
 
+	public String getNewEntryName() {
+		return newEntryName;
+	}
 }

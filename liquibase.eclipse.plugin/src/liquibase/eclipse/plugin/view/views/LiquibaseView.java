@@ -132,10 +132,12 @@ public class LiquibaseView extends ViewPart {
 		addLiqConfButton.addSelectionListener(new SelectionAdapter() {
 		  @Override
 		  public void widgetSelected(SelectionEvent e) {
-		    WizardDialog wizardDialog = new WizardDialog(parent.getShell(),
-		      new LiqConfWizard());
+		    LiqConfWizard liqConfWizard = new LiqConfWizard();
+		    WizardDialog wizardDialog = new WizardDialog(parent.getShell(), liqConfWizard);
 		    if (wizardDialog.open() == Window.OK) {
 		      liquibaseViewController.initializeliqConfDropDown(liqConfDropDown);
+		      String entry = liqConfWizard.getNewEntryName();
+		      selectComboEntry(entry);
 		    } 
 		  }
 		}); 
@@ -289,9 +291,23 @@ public class LiquibaseView extends ViewPart {
 				ChangeSet.class));
 		return true;
 	}
-	
+
+	private void selectComboEntry(String entry) {
+		String[] items = liqConfDropDown.getItems();
+		for (int i = 0; i < items.length; i++) {
+			if(entry.equals(items[i])) {
+				liqConfDropDown.select(i);
+				Event event = new Event();
+				event.type = SWT.Selection;
+				event.widget = liqConfDropDown;
+				liqConfDropDown.notifyListeners(SWT.Selection, event);	
+			}
+		}
+	}
+
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
+	
 }
