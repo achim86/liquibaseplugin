@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
  * the tests fails. The screenshot is placed in a folder named 
  * screenshot within the project structure.
  * 
- * @author gblia
+ * @author afinke
  *
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
