@@ -23,3 +23,5 @@ Doesn't Include:
 	![fileurls](http://img687.imageshack.us/img687/5705/ojdbc.png)
 3. Add dependencies to org.oracle.osgi on liquibase.eclipse.plugin and liquibase.plugin
 	![fileurls](http://img411.imageshack.us/img411/5573/dependencies.png)
+
+Furthermore you should add -XX:MaxPermSize=128m to your run configuration.
