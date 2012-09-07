@@ -49,7 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * All the layout and data binding for the LiquibaseView.
  * 
- * @author gblia
+ * @author afinke
  *
  */
 public class LiquibaseView extends ViewPart {
@@ -69,6 +69,7 @@ public class LiquibaseView extends ViewPart {
 	private String changeLogPath;
 	private Combo liqConfDropDown;
 	private Button releaseButton;
+	private Button restoreButton;
 
 	public LiquibaseView() throws ClassNotFoundException, SQLException {
 		liquibaseViewController = new LiquibaseViewController();
@@ -106,6 +107,7 @@ public class LiquibaseView extends ViewPart {
 				// initialize
 				if(initializeChangelog(parent.getShell())) {
 					releaseButton.setEnabled(true);
+					restoreButton.setEnabled(true);
 				}
 				// add ResourceChangeListener
 				IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -158,6 +160,10 @@ public class LiquibaseView extends ViewPart {
 					if (result) {
 						liquibaseViewController.removeLiqConf(selection);
 						liquibaseViewController.initializeliqConfDropDown(liqConfDropDown);
+						releaseButton.setEnabled(false);
+						restoreButton.setEnabled(false);
+						viewer.setInput(null);
+					    viewer.refresh();
 					}
 				}
 			}
@@ -197,7 +203,7 @@ public class LiquibaseView extends ViewPart {
 		liquibaseViewController.setReleaseButton(releaseButton);
 		
 		// Liquibase Restore
-		Button restoreButton = new Button(parent, SWT.PUSH);
+		restoreButton = new Button(parent, SWT.PUSH);
 		restoreButton.setText("Restore");
 		restoreButton.setLayoutData(new GridData(
 				GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
