@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema targetNamespace="http://www.liquibase.org/xml/ns/ext/backupandrestore"
+		    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:liq="http://www.liquibase.org/xml/ns/dbchangelog"
+            elementFormDefault="qualified">
+	
+	<xsd:import namespace="http://www.liquibase.org/xml/ns/dbchangelog" 
+				schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" />
+	
+	<xsd:element name="backup">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element name="table" minOccurs="1" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="schemaName" type="xsd:string" />
+						<xsd:attribute name="tableName" type="xsd:string" use="required" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="prefix" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>

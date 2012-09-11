@@ -1,0 +1,1 @@
+XML Schema definitions of the used extensions.

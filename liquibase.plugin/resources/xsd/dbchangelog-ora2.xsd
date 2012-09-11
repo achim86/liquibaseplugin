@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema targetNamespace="http://www.liquibase.org/xml/ns/ext/ora2"
+		    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:liq="http://www.liquibase.org/xml/ns/dbchangelog"
+            elementFormDefault="qualified">
+	
+	<xsd:import namespace="http://www.liquibase.org/xml/ns/dbchangelog" 
+				schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd" />
+	
+	<xsd:element name="addNotNullConstraint">
+		<xsd:complexType>
+			<xsd:attribute name="schemaName" type="xsd:string" />
+			<xsd:attribute name="tableName" type="xsd:string" use="required" />
+			<xsd:attribute name="columnName" type="xsd:string" use="required" />
+			<xsd:attribute name="constraintName" type="xsd:string" use="required" />
+			<xsd:attribute name="defaultNullValue" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+		
+	<xsd:element name="dropNotNullConstraint">
+		<xsd:complexType>
+			<xsd:attribute name="schemaName" type="xsd:string" />
+			<xsd:attribute name="tableName" type="xsd:string" use="required" />
+			<xsd:attribute name="constraintName" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>
