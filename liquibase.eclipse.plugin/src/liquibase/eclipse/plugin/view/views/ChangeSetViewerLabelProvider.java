@@ -24,6 +24,8 @@ public class ChangeSetViewerLabelProvider extends ObservableMapLabelProvider {
 			Activator.getImageDescriptor("icons/changeset.gif").createImage();
 	private static final Image HOURGLASS = 
 			Activator.getImageDescriptor("icons/hourglass.gif").createImage();
+	private static final Image ERROR = 
+			Activator.getImageDescriptor("icons/error.gif").createImage();
 
 	public ChangeSetViewerLabelProvider(IObservableMap[] labelMaps) {
 		super(labelMaps);
@@ -74,6 +76,7 @@ public class ChangeSetViewerLabelProvider extends ObservableMapLabelProvider {
 					case UNRUN: return UNCHECKED;
 					case RUNNING: return HOURGLASS;
 					case EXECUTED: return CHECKED;
+					case ERROR: return ERROR;
 					default: return null;
 				}
 			default:

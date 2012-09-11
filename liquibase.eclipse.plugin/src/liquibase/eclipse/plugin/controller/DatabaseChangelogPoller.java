@@ -10,7 +10,7 @@ import java.util.Iterator;
 import liquibase.eclipse.plugin.model.ChangeSet;
 import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
-import liquibase.eclipse.plugin.model.Status;
+import liquibase.eclipse.plugin.model.ChangeSetStatus;
 
 
 /**
@@ -88,7 +88,7 @@ public class DatabaseChangelogPoller implements Runnable {
 		ChangeSetContentProvider changeSetContentProvider = ChangeSetContentProvider.getInstance();
 		if(!initialized) {
 			ChangeSet firstChangeSet = changeSetContentProvider.getChangeSets().get(0);
-			firstChangeSet.setStatus(Status.RUNNING);
+			firstChangeSet.setStatus(ChangeSetStatus.RUNNING);
 			initialized = isLiqInitialized();
 		} else {
 			try {
@@ -104,19 +104,19 @@ public class DatabaseChangelogPoller implements Runnable {
 					while (changeSetIterator.hasNext()) {
 						ChangeSet changeSet = (ChangeSet) changeSetIterator.next();
 						if(changeSet.getId().equalsIgnoreCase(tmpId) && 
-						  (changeSet.getStatus().equals(Status.UNRUN) || 
-						   changeSet.getStatus().equals(Status.RUNNING))) {
-							changeSet.setStatus(Status.EXECUTED);
+						  (changeSet.getStatus().equals(ChangeSetStatus.UNRUN) || 
+						   changeSet.getStatus().equals(ChangeSetStatus.RUNNING))) {
+							changeSet.setStatus(ChangeSetStatus.EXECUTED);
 							// measure time from last execution till now
 							long executionTime = System.currentTimeMillis() - startTime;
 							changeSet.setExecutionTime(executionTime);
 							// start measuring start time for next change set
 							startTime = System.currentTimeMillis();
 							// set next change set to running
-							if(changeSet.getStatus().equals(Status.EXECUTED) && changeSetIterator.hasNext()) {
+							if(changeSet.getStatus().equals(ChangeSetStatus.EXECUTED) && changeSetIterator.hasNext()) {
 								changeSet = (ChangeSet) changeSetIterator.next();
-								if(changeSet.getStatus().equals(Status.UNRUN)) {
-									changeSet.setStatus(Status.RUNNING);
+								if(changeSet.getStatus().equals(ChangeSetStatus.UNRUN)) {
+									changeSet.setStatus(ChangeSetStatus.RUNNING);
 								}
 							}
 						}

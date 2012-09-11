@@ -6,10 +6,11 @@ package liquibase.eclipse.plugin.model;
  * @author afinke
  *
  */
-public enum Status {
+public enum ChangeSetStatus {
 	
 	UNRUN,
 	RUNNING,
-	EXECUTED
+	EXECUTED,
+	ERROR
 
 };

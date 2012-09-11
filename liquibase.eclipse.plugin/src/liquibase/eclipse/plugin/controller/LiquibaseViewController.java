@@ -17,7 +17,7 @@ import liquibase.eclipse.plugin.Activator;
 import liquibase.eclipse.plugin.model.ChangeSet;
 import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
-import liquibase.eclipse.plugin.model.Status;
+import liquibase.eclipse.plugin.model.ChangeSetStatus;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.FileSystemResourceAccessor;
@@ -27,6 +27,7 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Shell;
 
 
 /**
@@ -73,7 +74,7 @@ public class LiquibaseViewController {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		clearChangeSets();
+		cleanChangeSets();
 		initializeLiquibase(con);
 		initUnrunChangeSets(liquibase);
 
@@ -82,9 +83,9 @@ public class LiquibaseViewController {
 	/**
 	 * Starts {@link liquibase.eclipse.plugin.controller.RelaseJob}. 
 	 */
-	public void release() {
+	public void release(Shell shell) {
 		initializeLiquibase(con);
-		ReleaseJob releaseJob = new ReleaseJob("Liquibase Release", databaseConfiguration, liquibase, releaseButton);
+		ReleaseJob releaseJob = new ReleaseJob("Liquibase Release", databaseConfiguration, liquibase, releaseButton, shell);
 		releaseJob.schedule();
 	}
 	
@@ -198,11 +199,11 @@ public class LiquibaseViewController {
 	private void initUnrunChangeSets(Liquibase liquibase) throws LiquibaseException {
 		List<liquibase.changelog.ChangeSet> unRunChangeSets = liquibase.listUnrunChangeSets(null);
 		for (liquibase.changelog.ChangeSet unRunChangeSet : unRunChangeSets) {
-			 ChangeSetContentProvider.getInstance().addChangeSet(new ChangeSet(unRunChangeSet.getId(), Status.UNRUN));
+			 ChangeSetContentProvider.getInstance().addChangeSet(new ChangeSet(unRunChangeSet.getId(), ChangeSetStatus.UNRUN));
 		}
 	}
 	
-	private void clearChangeSets() {
+	private void cleanChangeSets() {
 		ChangeSetContentProvider.getInstance().cleanChangeSets();
 	}
 	

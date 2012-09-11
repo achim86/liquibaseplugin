@@ -10,10 +10,10 @@ package liquibase.eclipse.plugin.model;
 public class ChangeSet extends AbstractModelObject {
 
 	private String id;
-	private volatile Status status;
+	private volatile ChangeSetStatus status;
 	private long executionTime;
 
-	public ChangeSet(String id, Status status) {
+	public ChangeSet(String id, ChangeSetStatus status) {
 		this.id = id;
 		this.status = status;
 	}
@@ -26,11 +26,11 @@ public class ChangeSet extends AbstractModelObject {
 		firePropertyChange("id", this.id, this.id = id);
 	}
 
-	public synchronized Status getStatus() {
+	public synchronized ChangeSetStatus getStatus() {
 		return status;
 	}
 
-	public synchronized void setStatus(Status status) {
+	public synchronized void setStatus(ChangeSetStatus status) {
 		firePropertyChange("status", this.status, this.status = status);
 	}
 

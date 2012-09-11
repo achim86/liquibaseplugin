@@ -195,7 +195,7 @@ public class LiquibaseView extends ViewPart {
 		Listener releaseButtonListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				liquibaseViewController.release();
+				liquibaseViewController.release(parent.getShell());
 			}
 		};
 		releaseButton.addListener(SWT.Selection, releaseButtonListener);
@@ -288,8 +288,8 @@ public class LiquibaseView extends ViewPart {
 	private boolean initializeChangelog(Shell shell) {
 		try {
 			liquibaseViewController.initChangeLog(changeLogPath, databaseConfiguration);
-		} catch (LiquibaseException e2) {
-			MessageDialog.openError(shell, "Error", e2.getMessage());
+		} catch (LiquibaseException e) {
+			MessageDialog.openError(shell, "Error", e.getMessage());
 			return false;
 		}
 		viewer.setInput(new WritableList(
