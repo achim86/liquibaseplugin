@@ -68,6 +68,7 @@ public class LiquibaseView extends ViewPart {
 	private DatabaseConfiguration databaseConfiguration;
 	private String changeLogPath;
 	private Combo liqConfDropDown;
+	private Button displayAllChangeSetsCheckBox;
 	private Button releaseButton;
 	private Button restoreButton;
 
@@ -80,9 +81,11 @@ public class LiquibaseView extends ViewPart {
 		GridLayout layout = new GridLayout(2, true);
 		parent.setLayout(layout);
 		
+		Composite liqConfChooseComposite = new Composite(parent, SWT.NONE);
+		liqConfChooseComposite.setLayout(new GridLayout(1, true));
 		// Liquibase Configuration
 		// Drop Down
-		liqConfDropDown = new Combo(parent, SWT.DROP_DOWN | SWT.BORDER);
+		liqConfDropDown = new Combo(liqConfChooseComposite, SWT.DROP_DOWN | SWT.BORDER);
 		liqConfDropDown.setLayoutData(new GridData(
 				GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 		liqConfDropDown.addSelectionListener(new SelectionAdapter() {
@@ -105,7 +108,7 @@ public class LiquibaseView extends ViewPart {
 					}
 				}
 				// initialize
-				if(initializeChangelog(parent.getShell())) {
+				if(initializeChangeLog(parent.getShell())) {
 					releaseButton.setEnabled(true);
 					restoreButton.setEnabled(true);
 				}
@@ -115,7 +118,7 @@ public class LiquibaseView extends ViewPart {
 					@Override
 					public void resourceChanged(IResourceChangeEvent event) {
 						releaseButton.setEnabled(false);
-						if(initializeChangelog(parent.getShell())) {
+						if(initializeChangeLog(parent.getShell())) {
 							releaseButton.setEnabled(true);
 						}
 					}
@@ -124,7 +127,17 @@ public class LiquibaseView extends ViewPart {
 			}
 		});
 		liquibaseViewController.initializeliqConfDropDown(liqConfDropDown);
+		// Display mode
+		displayAllChangeSetsCheckBox = new Button(liqConfChooseComposite, SWT.CHECK);
+		displayAllChangeSetsCheckBox.setText("Display ran ChangeSets");
+		displayAllChangeSetsCheckBox.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						initializeChangeLog(parent.getShell());
+					}
+				});
 
+		// Configuration Buttons
 		Composite liqConfManageComposite = new Composite(parent, SWT.NONE);
 		liqConfManageComposite.setLayout(new GridLayout(3, true));
 		// Add
@@ -187,6 +200,7 @@ public class LiquibaseView extends ViewPart {
 		};
 		inspectLiqConfButton.addListener(SWT.Selection, inspectLiqConfButtonListener);		
 		
+		// Operation Buttons
 		// Liquibase Release
 		releaseButton = new Button(parent, SWT.PUSH);
 		releaseButton.setText("Release");
@@ -201,7 +215,6 @@ public class LiquibaseView extends ViewPart {
 		releaseButton.addListener(SWT.Selection, releaseButtonListener);
 		releaseButton.setEnabled(false);
 		liquibaseViewController.setReleaseButton(releaseButton);
-		
 		// Liquibase Restore
 		restoreButton = new Button(parent, SWT.PUSH);
 		restoreButton.setText("Restore");
@@ -218,13 +231,11 @@ public class LiquibaseView extends ViewPart {
 									 "'" +  versionToRollbackTo + "' " + "?");
 					if (result) {
 						liquibaseViewController.restore(versionToRollbackTo);
-					} else {
-						// nothing to do
-					}
+					} 
 				} else {
 					MessageDialog.openError(parent.getShell(), "Error", "There is no previous version.");
 				}
-				if(initializeChangelog(parent.getShell())) {
+				if(initializeChangeLog(parent.getShell())) {
 					releaseButton.setEnabled(true);
 				}
 			}
@@ -285,9 +296,9 @@ public class LiquibaseView extends ViewPart {
 		return tableViewerColumn;
 	}
 	
-	private boolean initializeChangelog(Shell shell) {
+	private boolean initializeChangeLog(Shell shell) {
 		try {
-			liquibaseViewController.initChangeLog(changeLogPath, databaseConfiguration);
+			liquibaseViewController.initializeChangeLog(changeLogPath, databaseConfiguration, displayAllChangeSetsCheckBox.getSelection());
 		} catch (LiquibaseException e) {
 			MessageDialog.openError(shell, "Error", e.getMessage());
 			return false;

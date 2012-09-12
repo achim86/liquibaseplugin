@@ -87,9 +87,14 @@ public class DatabaseChangelogPoller implements Runnable {
 	public void pollDatabaseChangeLog() {
 		ChangeSetContentProvider changeSetContentProvider = ChangeSetContentProvider.getInstance();
 		if(!initialized) {
-			ChangeSet firstChangeSet = changeSetContentProvider.getChangeSets().get(0);
-			firstChangeSet.setStatus(ChangeSetStatus.RUNNING);
-			initialized = isLiqInitialized();
+			// Set the first change set which is unrun to running
+			for (ChangeSet changeSet : changeSetContentProvider.getChangeSets()) {
+				if(changeSet.getStatus().equals(ChangeSetStatus.UNRUN)) {
+					changeSet.setStatus(ChangeSetStatus.RUNNING);
+					initialized = isLiqInitialized();
+					break;
+				}
+			}
 		} else {
 			try {
 				// order by is need due to the reason that there can be executed many change sets
@@ -113,7 +118,8 @@ public class DatabaseChangelogPoller implements Runnable {
 							// start measuring start time for next change set
 							startTime = System.currentTimeMillis();
 							// set next change set to running
-							if(changeSet.getStatus().equals(ChangeSetStatus.EXECUTED) && changeSetIterator.hasNext()) {
+							if(changeSet.getStatus().equals(ChangeSetStatus.EXECUTED) && 
+							   changeSetIterator.hasNext()) {
 								changeSet = (ChangeSet) changeSetIterator.next();
 								if(changeSet.getStatus().equals(ChangeSetStatus.UNRUN)) {
 									changeSet.setStatus(ChangeSetStatus.RUNNING);

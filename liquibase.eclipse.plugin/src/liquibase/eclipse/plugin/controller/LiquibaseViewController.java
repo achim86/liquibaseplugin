@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import liquibase.Liquibase;
+import liquibase.changelog.RanChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -55,9 +56,11 @@ public class LiquibaseViewController {
 	 * 
 	 * @param changeLogPath the change log path
 	 * @param databaseConfiguration the database configuration
+	 * @param displayAllChangeSets true if already run change sets should be displayed 
+	 * 		  	                   false if only unrun change sets should be displayed
 	 * @throws LiquibaseException
 	 */
-	public void initChangeLog(String changeLogPath, DatabaseConfiguration databaseConfiguration) throws LiquibaseException {
+	public void initializeChangeLog(String changeLogPath, DatabaseConfiguration databaseConfiguration, boolean displayAllChangeSets) throws LiquibaseException {
 		this.changeLogPath = changeLogPath;
 		this.databaseConfiguration = databaseConfiguration;
 		try {
@@ -76,7 +79,7 @@ public class LiquibaseViewController {
 		}
 		cleanChangeSets();
 		initializeLiquibase(con);
-		initUnrunChangeSets(liquibase);
+		initializeChangeSets(liquibase, displayAllChangeSets);
 
 	}
 	
@@ -196,7 +199,13 @@ public class LiquibaseViewController {
 		this.releaseButton = releaseButton;
 	}
 	
-	private void initUnrunChangeSets(Liquibase liquibase) throws LiquibaseException {
+	private void initializeChangeSets(Liquibase liquibase, boolean displayAllChangeSets) throws LiquibaseException {
+		if(displayAllChangeSets) {
+			List<RanChangeSet> ranChangeSets = liquibase.getDatabase().getRanChangeSetList();
+			for (RanChangeSet ranChangeSet : ranChangeSets) {
+				ChangeSetContentProvider.getInstance().addChangeSet(new ChangeSet(ranChangeSet.getId(), ChangeSetStatus.FORMER_EXECUTED));
+			}
+		}
 		List<liquibase.changelog.ChangeSet> unRunChangeSets = liquibase.listUnrunChangeSets(null);
 		for (liquibase.changelog.ChangeSet unRunChangeSet : unRunChangeSets) {
 			 ChangeSetContentProvider.getInstance().addChangeSet(new ChangeSet(unRunChangeSet.getId(), ChangeSetStatus.UNRUN));

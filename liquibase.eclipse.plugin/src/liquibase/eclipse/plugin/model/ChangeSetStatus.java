@@ -11,6 +11,7 @@ public enum ChangeSetStatus {
 	UNRUN,
 	RUNNING,
 	EXECUTED,
+	FORMER_EXECUTED,
 	ERROR
 
 };
