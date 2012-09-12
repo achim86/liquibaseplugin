@@ -38,8 +38,9 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class LiquibaseViewController {
-	public static final String oracleDriver = "oracle.jdbc.OracleDriver";
-
+	public static final String BASE_FOLDER = "database";
+	public static final String ORACLE_DRIVER = "oracle.jdbc.OracleDriver";
+	
 	private Connection con = null;
 	private Database database;
 	private DatabaseConfiguration databaseConfiguration;
@@ -64,7 +65,7 @@ public class LiquibaseViewController {
 		this.changeLogPath = changeLogPath;
 		this.databaseConfiguration = databaseConfiguration;
 		try {
-			Class.forName(oracleDriver);
+			Class.forName(ORACLE_DRIVER);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -224,8 +225,21 @@ public class LiquibaseViewController {
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
+		/* Liquibase identifies each ChangeSet by its id, author and file class path
+		 * (path from liquibase executable to the specific file)
+		 * 
+		 * Due to this reason executing ChangeSets or better Logs via the plug-in and ant
+		 * leads to different identifiers. The following snippet synchronizes the base path 
+		 * with the corresponding ANT-tasks. 
+		 * 
+		 * This wouldn't be needed with the use of logicalFilePath but you can't link to 
+		 * files by setting logicalFilePath. */
+		changeLogPath.replace("\\", "/");
+		String[] splittedChangeLogPath = changeLogPath.split(BASE_FOLDER + "/");
+		String basePath = splittedChangeLogPath[0] + BASE_FOLDER + "/";
+		String changeLogPath = splittedChangeLogPath[1];
 		try {
-			liquibase = new Liquibase(changeLogPath, new FileSystemResourceAccessor(), database);
+			liquibase = new Liquibase(changeLogPath, new FileSystemResourceAccessor(basePath), database);
 		} catch (LiquibaseException e) {
 			e.printStackTrace();
 		}

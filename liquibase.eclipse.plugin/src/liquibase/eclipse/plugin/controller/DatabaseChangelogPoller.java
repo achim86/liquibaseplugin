@@ -42,7 +42,7 @@ public class DatabaseChangelogPoller implements Runnable {
 		// measure start time for the first change set
 		startTime = System.currentTimeMillis();
 		try {
-			Class.forName(LiquibaseViewController.oracleDriver);
+			Class.forName(LiquibaseViewController.ORACLE_DRIVER);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
