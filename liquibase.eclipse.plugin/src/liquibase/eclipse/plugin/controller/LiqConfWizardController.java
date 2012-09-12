@@ -19,6 +19,10 @@ import liquibase.eclipse.plugin.Activator;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -133,6 +137,7 @@ public class LiqConfWizardController {
 			e.printStackTrace();
 		}
 		file.delete();
+		refreshWorkspace();
 		return true;
 	}
 	 
@@ -189,6 +194,18 @@ public class LiqConfWizardController {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private void refreshWorkspace() {
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+			if(project.isOpen()) {
+				try {
+					project.refreshLocal(IResource.DEPTH_INFINITE, null);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }
