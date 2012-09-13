@@ -234,7 +234,7 @@ public class LiquibaseViewController {
 		 * 
 		 * This wouldn't be needed with the use of logicalFilePath but you can't link to 
 		 * files by setting logicalFilePath. */
-		changeLogPath.replace("\\", "/");
+		changeLogPath = changeLogPath.replace("\\", "/");
 		String[] splittedChangeLogPath = changeLogPath.split(BASE_FOLDER + "/");
 		String basePath = splittedChangeLogPath[0] + BASE_FOLDER + "/";
 		String changeLogPath = splittedChangeLogPath[1];
