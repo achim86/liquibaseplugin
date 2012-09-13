@@ -66,9 +66,12 @@ public class ReleaseJob extends Job {
 		} catch (LiquibaseException e) {
 			databaseChangelogPoller.stop();
 			executor.shutdown();
+			String errorMessage = e.getMessage();
+			// changelog path, id, author
+			String[] splittedErrorMessage = errorMessage.split("::");
 			List<ChangeSet> changeSets = ChangeSetContentProvider.getInstance().getChangeSets();
 			for (ChangeSet changeSet : changeSets) {
-				if(changeSet.getStatus().equals(ChangeSetStatus.RUNNING)) {
+				if(changeSet.getId().equals(splittedErrorMessage[1])) {
 					changeSet.setStatus(ChangeSetStatus.ERROR);
 					break;
 				}
