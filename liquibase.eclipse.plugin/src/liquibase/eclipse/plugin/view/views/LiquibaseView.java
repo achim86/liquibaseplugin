@@ -117,9 +117,12 @@ public class LiquibaseView extends ViewPart {
 				IResourceChangeListener listener = new IResourceChangeListener() {
 					@Override
 					public void resourceChanged(IResourceChangeEvent event) {
-						releaseButton.setEnabled(false);
-						if(initializeChangeLog(parent.getShell())) {
-							releaseButton.setEnabled(true);
+						if(event.getType() == IResourceChangeEvent.POST_CHANGE) {
+							System.out.println("blub");
+							releaseButton.setEnabled(false);
+							if(initializeChangeLog(parent.getShell())) {
+								releaseButton.setEnabled(true);
+							}
 						}
 					}
 				};
