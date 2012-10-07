@@ -117,9 +117,12 @@ public class LiquibaseView extends ViewPart {
 				IResourceChangeListener listener = new IResourceChangeListener() {
 					@Override
 					public void resourceChanged(IResourceChangeEvent event) {
-						releaseButton.setEnabled(false);
-						if(initializeChangeLog(parent.getShell())) {
-							releaseButton.setEnabled(true);
+						if(event.getType() == IResourceChangeEvent.POST_CHANGE) {
+							System.out.println("blub");
+							releaseButton.setEnabled(false);
+							if(initializeChangeLog(parent.getShell())) {
+								releaseButton.setEnabled(true);
+							}
 						}
 					}
 				};
@@ -263,7 +266,7 @@ public class LiquibaseView extends ViewPart {
 	    
 	    ILabelProvider labelProvider = new ChangeSetViewerLabelProvider(labelMaps);
 		
-		String[] titles = { "ID", "Executed" };
+		String[] titles = { "ID", "Status" };
 		int[] bounds = { 175, 100 };
 
 		createTableViewerColumn(titles[0], bounds[0], 0);
