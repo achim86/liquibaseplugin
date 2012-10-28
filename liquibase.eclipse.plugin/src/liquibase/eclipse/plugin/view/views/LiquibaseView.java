@@ -3,9 +3,10 @@ package liquibase.eclipse.plugin.view.views;
 import java.sql.SQLException;
 
 import liquibase.eclipse.plugin.Activator;
+import liquibase.eclipse.plugin.controller.ChangeSetContentProvider;
+import liquibase.eclipse.plugin.controller.ChangeSetViewerLabelProvider;
 import liquibase.eclipse.plugin.controller.LiquibaseViewController;
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.eclipse.plugin.view.wizards.LiqConfInspectWizard;
 import liquibase.eclipse.plugin.view.wizards.LiqConfWizard;

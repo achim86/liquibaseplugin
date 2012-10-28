@@ -1,7 +1,9 @@
-package liquibase.eclipse.plugin.model;
+package liquibase.eclipse.plugin.controller;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import liquibase.eclipse.plugin.model.ChangeSet;
 
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 

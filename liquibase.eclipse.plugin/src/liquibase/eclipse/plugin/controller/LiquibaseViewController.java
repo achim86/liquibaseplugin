@@ -16,7 +16,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.eclipse.plugin.Activator;
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
 import liquibase.exception.DatabaseException;

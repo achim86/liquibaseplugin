@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
 

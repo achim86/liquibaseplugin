@@ -1,8 +1,9 @@
-package liquibase.eclipse.plugin.view.views;
+package liquibase.eclipse.plugin.controller;
 
 import liquibase.eclipse.plugin.Activator;
 import liquibase.eclipse.plugin.model.ChangeSet;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
+import liquibase.eclipse.plugin.view.views.LiquibaseView;
 
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;

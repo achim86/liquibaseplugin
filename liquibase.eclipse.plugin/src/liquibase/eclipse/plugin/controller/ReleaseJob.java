@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 
 import liquibase.Liquibase;
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.ChangeSetContentProvider;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
 import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.exception.LiquibaseException;
