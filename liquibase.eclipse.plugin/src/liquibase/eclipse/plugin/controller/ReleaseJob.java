@@ -1,5 +1,6 @@
 package liquibase.eclipse.plugin.controller;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -7,7 +8,6 @@ import java.util.concurrent.Executors;
 import liquibase.Liquibase;
 import liquibase.eclipse.plugin.model.ChangeSet;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
-import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.exception.LiquibaseException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,18 +29,18 @@ import org.eclipse.swt.widgets.Shell;
 public class ReleaseJob extends Job {
 
 	private Liquibase liquibase;
-	private DatabaseConfiguration databaseConfiguration;
+	private Connection connection;
 	private Button releaseButton;
 	private Shell shell;
 	
 	public ReleaseJob(String name, 
-					  DatabaseConfiguration databaseConfiguration,
+					  Connection connection,
 					  Liquibase liquibase, 
 					  Button releaseButton,
 					  Shell shell) {
 		super(name);
 		this.liquibase = liquibase;
-		this.databaseConfiguration = databaseConfiguration;
+		this.connection = connection;
 		this.releaseButton = releaseButton;
 		this.shell = shell;
 	}
@@ -56,7 +56,7 @@ public class ReleaseJob extends Job {
 		});
 		ExecutorService executor = Executors.newCachedThreadPool();
 		DatabaseChangelogPoller databaseChangelogPoller = 
-				new DatabaseChangelogPoller(databaseConfiguration);
+				new DatabaseChangelogPoller(connection);
 		// start polling 'databasechangelog'
 		executor.execute(databaseChangelogPoller);
 		// start updating the database

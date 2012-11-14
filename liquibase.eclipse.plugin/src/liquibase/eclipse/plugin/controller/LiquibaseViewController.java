@@ -16,9 +16,8 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.eclipse.plugin.Activator;
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
-import liquibase.exception.DatabaseException;
+import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.FileSystemResourceAccessor;
 
@@ -40,15 +39,29 @@ public class LiquibaseViewController {
 	public static final String BASE_FOLDER = "database";
 	public static final String ORACLE_DRIVER = "oracle.jdbc.OracleDriver";
 	
-	private Connection con = null;
+	private Connection connection = null;
 	private Database database;
 	private DatabaseConfiguration databaseConfiguration;
 	private String changeLogPath;
 	private Liquibase liquibase;
 	private Button releaseButton;
 
-	public LiquibaseViewController() {
-		
+	public LiquibaseViewController() { }
+	
+	/**
+	 * Handles the connection to the database. Use this connection for custom queries.
+	 * 
+	 * @return the connection
+	 * @throws SQLException 
+	 */
+	public Connection getConnectionInstance() throws SQLException {
+		if (connection == null) {
+			connection = DriverManager.getConnection(
+					databaseConfiguration.getUrl(), 
+					databaseConfiguration.getUser(), 
+					databaseConfiguration.getPassword());
+		}
+		return connection;
 	}
 	
 	/**
@@ -59,8 +72,9 @@ public class LiquibaseViewController {
 	 * @param displayAllChangeSets true if already run change sets should be displayed 
 	 * 		  	                   false if only unrun change sets should be displayed
 	 * @throws LiquibaseException
+	 * @throws SQLException 
 	 */
-	public void initializeChangeLog(String changeLogPath, DatabaseConfiguration databaseConfiguration, boolean displayAllChangeSets) throws LiquibaseException {
+	public void initializeChangeLog(String changeLogPath, DatabaseConfiguration databaseConfiguration, boolean displayAllChangeSets) throws LiquibaseException, SQLException {
 		this.changeLogPath = changeLogPath;
 		this.databaseConfiguration = databaseConfiguration;
 		try {
@@ -68,37 +82,28 @@ public class LiquibaseViewController {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		try {
-			con = DriverManager.getConnection(
-					databaseConfiguration.getUrl(), 
-					databaseConfiguration.getUser(), 
-					databaseConfiguration.getPassword());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		cleanChangeSets();
-		initializeLiquibase(con);
+		initializeLiquibase();
 		initializeChangeSets(liquibase, displayAllChangeSets);
 
 	}
 	
 	/**
 	 * Starts {@link liquibase.eclipse.plugin.controller.RelaseJob}. 
+	 * 
+	 * @throws SQLException 
+	 * @throws LiquibaseException 
 	 */
-	public void release(Shell shell) {
-		initializeLiquibase(con);
-		ReleaseJob releaseJob = new ReleaseJob("Liquibase Release", databaseConfiguration, liquibase, releaseButton, shell);
+	public void release(Shell shell) throws SQLException, LiquibaseException {
+		initializeLiquibase();
+		ReleaseJob releaseJob = new ReleaseJob("Liquibase Release", getConnectionInstance(), liquibase, releaseButton, shell);
 		releaseJob.schedule();
 	}
 	
 	public String getLastVersion() {
-		Connection connection = null;
 		Statement statement = null;
 		ResultSet resultSet = null;
 		try {
-			connection = ((JdbcConnection) database.getConnection())
-					.getWrappedConnection();
 			// get the latest tag (which is number 2 in the tag order)
 			String sql = "SELECT tag FROM( " + 
 						    "SELECT tag, ROWNUM rn FROM( " +
@@ -107,7 +112,7 @@ public class LiquibaseViewController {
 						        "WHERE tag IS NOT NULL " +
 						        "ORDER BY tag DESC)) " +
 						  "WHERE rn = 2";
-			statement = connection.createStatement();
+			statement = getConnectionInstance().createStatement();
 			resultSet = statement.executeQuery(sql.toString());
 			while (resultSet.next()) {
 				String tmpTag = resultSet.getString("tag");
@@ -141,9 +146,11 @@ public class LiquibaseViewController {
 	 * Starts Liquibase rollback to the given version.
 	 * 
 	 * @param version the version
+	 * @throws LiquibaseException 
+	 * @throws SQLException 
 	 */
-	public void restore(String version) {
-		initializeLiquibase(con);
+	public void restore(String version) throws SQLException, LiquibaseException {
+		initializeLiquibase();
 		try {
 			liquibase.rollback(version, null);
 		} catch (LiquibaseException e) {
@@ -217,13 +224,10 @@ public class LiquibaseViewController {
 	}
 	
 	// re initialize liquibase to avoid problems accessing databasechangelog
-	private void initializeLiquibase(Connection con) {
-		try {
+	private void initializeLiquibase() throws SQLException, LiquibaseException {
 			database = DatabaseFactory.getInstance()
-					.findCorrectDatabaseImplementation(new JdbcConnection(con));
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
+					.findCorrectDatabaseImplementation(new JdbcConnection(getConnectionInstance()));
+
 		/* Liquibase identifies each ChangeSet by its id, author and file class path
 		 * (path from liquibase executable to the specific file)
 		 * 
@@ -237,10 +241,8 @@ public class LiquibaseViewController {
 		String[] splittedChangeLogPath = changeLogPath.split(BASE_FOLDER + "/");
 		String basePath = splittedChangeLogPath[0] + BASE_FOLDER + "/";
 		String changeLogPath = splittedChangeLogPath[1];
-		try {
-			liquibase = new Liquibase(changeLogPath, new FileSystemResourceAccessor(basePath), database);
-		} catch (LiquibaseException e) {
-			e.printStackTrace();
-		}
+		
+		liquibase = new Liquibase(changeLogPath, new FileSystemResourceAccessor(basePath), database);
+
 	}
 }

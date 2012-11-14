@@ -39,6 +39,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -119,10 +120,17 @@ public class LiquibaseView extends ViewPart {
 					@Override
 					public void resourceChanged(IResourceChangeEvent event) {
 						if(event.getType() == IResourceChangeEvent.POST_CHANGE) {
-							System.out.println("blub");
-							releaseButton.setEnabled(false);
+							Display.getDefault().syncExec(new Runnable() {
+							    public void run() {
+							    	releaseButton.setEnabled(false);
+							    }
+							});
 							if(initializeChangeLog(parent.getShell())) {
-								releaseButton.setEnabled(true);
+								Display.getDefault().syncExec(new Runnable() {
+								    public void run() {
+								    	releaseButton.setEnabled(true);
+								    }
+								});
 							}
 						}
 					}
@@ -213,7 +221,13 @@ public class LiquibaseView extends ViewPart {
 		Listener releaseButtonListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				liquibaseViewController.release(parent.getShell());
+				try {
+					liquibaseViewController.release(parent.getShell());
+				} catch (SQLException e) {
+					MessageDialog.openError(parent.getShell(), "Error", e.getMessage());
+				} catch (LiquibaseException e) {
+					MessageDialog.openError(parent.getShell(), "Error", e.getMessage());
+				}
 			}
 		};
 		releaseButton.addListener(SWT.Selection, releaseButtonListener);
@@ -234,7 +248,13 @@ public class LiquibaseView extends ViewPart {
 									"Are you sure to restore version " + 
 									 "'" +  versionToRollbackTo + "' " + "?");
 					if (result) {
-						liquibaseViewController.restore(versionToRollbackTo);
+						try {
+							liquibaseViewController.restore(versionToRollbackTo);
+						} catch (SQLException e) {
+							MessageDialog.openError(parent.getShell(), "Error", e.getMessage());
+						} catch (LiquibaseException e) {
+							MessageDialog.openError(parent.getShell(), "Error", e.getMessage());
+						}
 					} 
 				} else {
 					MessageDialog.openError(parent.getShell(), "Error", "There is no previous version.");
@@ -304,6 +324,9 @@ public class LiquibaseView extends ViewPart {
 		try {
 			liquibaseViewController.initializeChangeLog(changeLogPath, databaseConfiguration, displayAllChangeSetsCheckBox.getSelection());
 		} catch (LiquibaseException e) {
+			MessageDialog.openError(shell, "Error", e.getMessage());
+			return false;
+		} catch (SQLException e) {
 			MessageDialog.openError(shell, "Error", e.getMessage());
 			return false;
 		}

@@ -1,14 +1,12 @@
 package liquibase.eclipse.plugin.controller;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 
 import liquibase.eclipse.plugin.model.ChangeSet;
-import liquibase.eclipse.plugin.model.DatabaseConfiguration;
 import liquibase.eclipse.plugin.model.ChangeSetStatus;
 
 
@@ -27,51 +25,30 @@ public class DatabaseChangelogPoller implements Runnable {
 	private boolean initialized;
 	private long startTime;
 	private volatile boolean isRunning = true;
-	private DatabaseConfiguration databaseConfiguration;
 	private Connection connection;
 	private PreparedStatement preparedStatement;
 	private ResultSet resultSet;
 	
-	public DatabaseChangelogPoller(DatabaseConfiguration databaseConfiguration) {
-		this.databaseConfiguration = databaseConfiguration;
+	public DatabaseChangelogPoller(Connection connection) {
+		this.connection = connection;
 	}
 	
 	@Override
 	public void run() {
 		// measure start time for the first change set
 		startTime = System.currentTimeMillis();
-		try {
-			Class.forName(LiquibaseViewController.ORACLE_DRIVER);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			connection = DriverManager.getConnection(
-					databaseConfiguration.getUrl(), 
-					databaseConfiguration.getUser(), 
-					databaseConfiguration.getPassword());
-			while (isRunning) {
-				// poll the databasechangelog table
-				pollDatabaseChangeLog();
-				try {
-					// sleep to take load from database
-					Thread.sleep(pollInterval);
-				} catch (InterruptedException e) {
-					// interrupt is expected
-				}
-			}
-			// final poll to get last run change sets
+		while (isRunning) {
+			// poll the databasechangelog table
 			pollDatabaseChangeLog();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
 			try {
-				connection.close();
-			} catch (SQLException e) {
-				// not the reason, but a follow up error
+				// sleep to take load from database
+				Thread.sleep(pollInterval);
+			} catch (InterruptedException e) {
+				// interrupt is expected
 			}
 		}
+		// final poll to get last run change sets
+		pollDatabaseChangeLog();
 	}
 
 	public void stop() {
