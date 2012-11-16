@@ -55,7 +55,7 @@ public class LiquibaseViewController {
 	 * @throws SQLException 
 	 */
 	public Connection getConnectionInstance() throws SQLException {
-		if (connection == null) {
+		if (connection == null || connection.isClosed()) {
 			connection = DriverManager.getConnection(
 					databaseConfiguration.getUrl(), 
 					databaseConfiguration.getUser(), 
@@ -83,7 +83,7 @@ public class LiquibaseViewController {
 			e.printStackTrace();
 		}
 		cleanChangeSets();
-		initializeLiquibase();
+		initializeLiquibase(true);
 		initializeChangeSets(liquibase, displayAllChangeSets);
 
 	}
@@ -95,7 +95,7 @@ public class LiquibaseViewController {
 	 * @throws LiquibaseException 
 	 */
 	public void release(Shell shell) throws SQLException, LiquibaseException {
-		initializeLiquibase();
+		initializeLiquibase(false);
 		ReleaseJob releaseJob = new ReleaseJob("Liquibase Release", getConnectionInstance(), liquibase, releaseButton, shell);
 		releaseJob.schedule();
 	}
@@ -150,7 +150,7 @@ public class LiquibaseViewController {
 	 * @throws SQLException 
 	 */
 	public void restore(String version) throws SQLException, LiquibaseException {
-		initializeLiquibase();
+		initializeLiquibase(false);
 		try {
 			liquibase.rollback(version, null);
 		} catch (LiquibaseException e) {
@@ -224,7 +224,10 @@ public class LiquibaseViewController {
 	}
 	
 	// re initialize liquibase to avoid problems accessing databasechangelog
-	private void initializeLiquibase() throws SQLException, LiquibaseException {
+	private void initializeLiquibase(boolean isNewConnection) throws SQLException, LiquibaseException {
+		if(isNewConnection && connection != null) {
+			getConnectionInstance().close();
+		}
 			database = DatabaseFactory.getInstance()
 					.findCorrectDatabaseImplementation(new JdbcConnection(getConnectionInstance()));
 
@@ -243,6 +246,5 @@ public class LiquibaseViewController {
 		String changeLogPath = splittedChangeLogPath[1];
 		
 		liquibase = new Liquibase(changeLogPath, new FileSystemResourceAccessor(basePath), database);
-
 	}
 }
