@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import liquibase.Liquibase;
 import liquibase.changelog.RanChangeSet;
@@ -100,33 +102,28 @@ public class LiquibaseViewController {
 		releaseJob.schedule();
 	}
 	
+	/**
+	 * Returns the last version to rollback to.
+	 * 
+	 * @return the version to rollback to
+	 */
 	public String getLastVersion() {
 		Statement statement = null;
 		ResultSet resultSet = null;
+		Set<String> existingSet = null;
 		try {
-			// get the latest tag (which is number 2 in the tag order)
-			String sql = "SELECT tag FROM( " + 
-						    "SELECT tag, ROWNUM rn FROM( " +
-						        "SELECT DISTINCT tag " +
-						        "FROM databasechangelog " +
-						        "WHERE tag IS NOT NULL " +
-						        "ORDER BY tag DESC)) " +
-						  "WHERE rn = 2";
+			String sql = "SELECT tag, orderexecuted " + 
+						 "FROM databasechangelog " +
+						 "WHERE tag IS NOT NULL " +
+						 "ORDER BY orderexecuted";
 			statement = getConnectionInstance().createStatement();
 			resultSet = statement.executeQuery(sql.toString());
+			/* The query may return a tag multiple times; so its uniqueness
+			   will be guaranteed by using a set. */
+			existingSet = new HashSet<String>();
 			while (resultSet.next()) {
 				String tmpTag = resultSet.getString("tag");
-				return tmpTag;
-			}
-			// special case deploy from version 0 breaks
-			sql = "SELECT DISTINCT tag " +
-				  "FROM databasechangelog " +
-				  "WHERE tag IS NOT NULL";
-			statement = connection.createStatement();
-			resultSet = statement.executeQuery(sql.toString());
-			while (resultSet.next()) {
-				String tmpTag = resultSet.getString("tag");
-				return tmpTag;
+				existingSet.add(tmpTag);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -138,8 +135,14 @@ public class LiquibaseViewController {
 			} catch (SQLException e) {
 				// not the reason, but a follow up error
 			}
-		}	
-		return null;
+		}
+		// Due to the reason a set is difficult to access, its castet to a list.
+		List<String> existingTagList = new ArrayList<String>(existingSet);
+		switch(existingTagList.size()) {
+			case 0: return null;
+			case 1: return existingTagList.get(0);
+			default: return existingTagList.get(existingTagList.size() - 2);
+		}
 	}
 	
 	/**
