@@ -123,15 +123,11 @@ public class LiquibaseView extends ViewPart {
 							Display.getDefault().syncExec(new Runnable() {
 							    public void run() {
 							    	releaseButton.setEnabled(false);
+							    	if(initializeChangeLog(parent.getShell())) {
+							    		releaseButton.setEnabled(true);
+							    	}	
 							    }
-							});
-							if(initializeChangeLog(parent.getShell())) {
-								Display.getDefault().syncExec(new Runnable() {
-								    public void run() {
-								    	releaseButton.setEnabled(true);
-								    }
-								});
-							}
+						});
 						}
 					}
 				};
@@ -322,7 +318,10 @@ public class LiquibaseView extends ViewPart {
 	
 	private boolean initializeChangeLog(Shell shell) {
 		try {
-			liquibaseViewController.initializeChangeLog(changeLogPath, databaseConfiguration, displayAllChangeSetsCheckBox.getSelection());
+			liquibaseViewController.initializeChangeLog(
+					changeLogPath, 
+					databaseConfiguration, 
+					displayAllChangeSetsCheckBox.getSelection());
 		} catch (LiquibaseException e) {
 			MessageDialog.openError(shell, "Error", e.getMessage());
 			return false;
