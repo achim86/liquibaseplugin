@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -110,7 +110,7 @@ public class LiquibaseViewController {
 	public String getLastVersion() {
 		Statement statement = null;
 		ResultSet resultSet = null;
-		Set<String> existingSet = null;
+		Set<String> existingTagsSet = null;
 		try {
 			String sql = "SELECT tag, orderexecuted " + 
 						 "FROM databasechangelog " +
@@ -120,10 +120,11 @@ public class LiquibaseViewController {
 			resultSet = statement.executeQuery(sql.toString());
 			/* The query may return a tag multiple times; so its uniqueness
 			   will be guaranteed by using a set. */
-			existingSet = new HashSet<String>();
+			existingTagsSet = new LinkedHashSet<String>();
 			while (resultSet.next()) {
 				String tmpTag = resultSet.getString("tag");
-				existingSet.add(tmpTag);
+				System.out.println(tmpTag);
+				existingTagsSet.add(tmpTag);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -137,7 +138,10 @@ public class LiquibaseViewController {
 			}
 		}
 		// Due to the reason a set is difficult to access, its castet to a list.
-		List<String> existingTagList = new ArrayList<String>(existingSet);
+		List<String> existingTagList = new ArrayList<String>(existingTagsSet);
+		for (String string : existingTagList) {
+			System.out.println(string);
+		}
 		switch(existingTagList.size()) {
 			case 0: return null;
 			case 1: return existingTagList.get(0);

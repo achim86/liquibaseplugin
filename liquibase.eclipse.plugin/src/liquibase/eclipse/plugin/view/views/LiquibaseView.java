@@ -119,15 +119,17 @@ public class LiquibaseView extends ViewPart {
 				IResourceChangeListener listener = new IResourceChangeListener() {
 					@Override
 					public void resourceChanged(IResourceChangeEvent event) {
-						if(event.getType() == IResourceChangeEvent.POST_CHANGE) {
-							Display.getDefault().syncExec(new Runnable() {
-							    public void run() {
-							    	releaseButton.setEnabled(false);
-							    	if(initializeChangeLog(parent.getShell())) {
-							    		releaseButton.setEnabled(true);
-							    	}	
-							    }
-						});
+						if (viewer != null && !viewer.getControl().isDisposed()) {
+							if(event.getType() == IResourceChangeEvent.POST_CHANGE) {
+								Display.getDefault().syncExec(new Runnable() {
+								    public void run() {
+								    	releaseButton.setEnabled(false);
+								    	if(initializeChangeLog(parent.getShell())) {
+								    		releaseButton.setEnabled(true);
+								    	}	
+								    }
+								});
+							}
 						}
 					}
 				};
